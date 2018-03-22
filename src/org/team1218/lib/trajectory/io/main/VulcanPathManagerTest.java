@@ -12,7 +12,7 @@ import com.team254.lib.trajectory.TrajectoryGenerator;
 import com.team254.lib.trajectory.WaypointSequence;
 import com.team254.lib.trajectory.TrajectoryGenerator.Config;
 
-public class VulcanPathPlanerTest {
+public class VulcanPathManagerTest {
 
 	public static void main(String[] args) throws IOException {
 		
@@ -26,15 +26,8 @@ public class VulcanPathPlanerTest {
 	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(0.0,0.0,0.0));
 	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(7, 0, 0));
 	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(17.83,16,Math.toRadians(89.0)));
-		
-	     
-	    Path path = PathGenerator.makePath(rightStartRightScaleWaypoints, trajConfig, 2.0, "test");
-	    PathPack testPathPack = new PathPack();
-	    testPathPack.path = path;
-	    testPathPack.config = trajConfig;
-	    testPathPack.ws = rightStartRightScaleWaypoints;
-	    testPathPack.track_width = 2.0;
-		PathManager.getPath(testPathPack, "test");
+	    
+		PathManager.getPath(rightStartRightScaleWaypoints,trajConfig,2.0, "test");
 	}
 
 }

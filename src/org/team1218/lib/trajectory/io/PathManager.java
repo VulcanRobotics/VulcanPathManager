@@ -26,7 +26,15 @@ public class PathManager {
 		public Path path;
 		public Config config;
 		public WaypointSequence ws;
-		public double track_width;
+		public double trackWidth;
+	}
+	
+	public static Path getPath(WaypointSequence ws, Config config, double trackWidth, String name) {
+		PathPack pathPack = new PathPack();
+		pathPack.ws = ws;
+		pathPack.config = config;
+		pathPack.trackWidth = trackWidth;
+		return getPath(pathPack,name);
 	}
 	
 	public static Path getPath(PathPack input, String name) {
@@ -48,11 +56,11 @@ public class PathManager {
 			System.out.println("File not found.");
 		}
 		System.out.println("Failed to load path from file, generating path.");
-		Path path = PathGenerator.makePath(input.ws, input.config, input.track_width, name);
+		Path path = PathGenerator.makePath(input.ws, input.config, input.trackWidth, name);
 		PathPack output = new PathPack();
 		output.ws = input.ws;
 		output.config = input.config;
-		output.track_width = input.track_width;
+		output.trackWidth = input.trackWidth;
 		output.path = path;
 		System.out.println("Done, attempting to write result to file.");
 		try {
@@ -75,7 +83,7 @@ public class PathManager {
 		Path path = pathPack.path;
 		Config config = pathPack.config;
 		WaypointSequence ws = pathPack.ws;
-		double trackWidth = pathPack.track_width;
+		double trackWidth = pathPack.trackWidth;
 		
 		//write comment block
 		writer.write("# " + path.getName()+"\n");
@@ -153,7 +161,7 @@ public class PathManager {
 						config.max_acc = Double.parseDouble(tokens[2]);
 						config.max_jerk = Double.parseDouble(tokens[3]);
 						pathPack.config = config;
-						pathPack.track_width = Double.parseDouble(tokens[4]);
+						pathPack.trackWidth = Double.parseDouble(tokens[4]);
 					}else if(tokens.length == 1 && tokens[0].equals("")) {
 						if(pathPack.config == null) {
 							return null;
@@ -280,6 +288,6 @@ public class PathManager {
 	}
 	
 	public static boolean comparePathPacks(PathPack a, PathPack b) {
-		return compareConfig(a.config,b.config) && compareTrackWidth(a.track_width,b.track_width) && compareWaypointSequences(a.ws,b.ws);
+		return compareConfig(a.config,b.config) && compareTrackWidth(a.trackWidth,b.trackWidth) && compareWaypointSequences(a.ws,b.ws);
 	}
 }
