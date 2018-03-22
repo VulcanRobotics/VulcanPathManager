@@ -12,6 +12,7 @@ import java.io.Writer;
 import java.util.Date;
 
 import com.team254.lib.trajectory.Path;
+import com.team254.lib.trajectory.PathGenerator;
 import com.team254.lib.trajectory.Trajectory;
 import com.team254.lib.trajectory.TrajectoryGenerator.Config;
 import com.team254.lib.trajectory.WaypointSequence;
@@ -28,12 +29,53 @@ public class PathManager {
 		public double track_width;
 	}
 	
-	public static void creatPathFile(File file,Path path,WaypointSequence ws,Config config,double trackWidth) throws IOException {
+	public static Path getPath(PathPack input, String name) {
+		File file = new File("paths/" + name + ".path");
+		System.out.println("attempting to find path file.");
+		try{
+			PathPack output = readPathFile(file);
+			if(output != null) {
+				if(comparePathPacks(input,output)) {
+					System.out.print("Path Match! Returning path from file.");
+					return output.path;
+				}else {
+					System.out.println("Path Mismatch!");
+				}
+			}else {
+				System.out.println("File invalid.");
+			}
+		}catch(IOException e){
+			System.out.println("File not found.");
+		}
+		System.out.println("Failed to load path from file, generating path.");
+		Path path = PathGenerator.makePath(input.ws, input.config, input.track_width, name);
+		PathPack output = new PathPack();
+		output.ws = input.ws;
+		output.config = input.config;
+		output.track_width = input.track_width;
+		output.path = path;
+		System.out.println("Done, attempting to write result to file.");
+		try {
+			creatPathFile(file,output);
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
+		return output.path;
+		
+	}
+	
+	
+	public static void creatPathFile(File file,PathPack pathPack) throws IOException {
 		if(!file.exists()) {
 			file.getParentFile().mkdirs();
 			file.createNewFile();
 		}
 		Writer writer = new BufferedWriter(new FileWriter(file));
+		
+		Path path = pathPack.path;
+		Config config = pathPack.config;
+		WaypointSequence ws = pathPack.ws;
+		double trackWidth = pathPack.track_width;
 		
 		//write comment block
 		writer.write("# " + path.getName()+"\n");
@@ -91,7 +133,7 @@ public class PathManager {
 		String line;
 		PathPack pathPack = new PathPack();
 		pathPack.ws = new WaypointSequence(10);
-		pathPack.path = new Path();
+		pathPack.path = null;
 		String name = "";
 		Trajectory leftTraj = null;
 		Trajectory rightTraj = null;
@@ -101,7 +143,6 @@ public class PathManager {
 		while((line = reader.readLine()) != null) {
 			if(!line.startsWith("#")) {
 				String tokens[] = line.split(" ");
-				System.out.println(tokens.length + "," + state);
 				switch(state) {
 				
 				case 0:{
@@ -181,7 +222,7 @@ public class PathManager {
 							segmentCounter = 0;
 						}
 					}
-					case 4:{
+					case 3:{
 						if(segmentCounter < rightTraj.getNumSegments()) {
 							if(tokens.length == 8) {
 								Segment seg = new Segment();
@@ -198,7 +239,8 @@ public class PathManager {
 							}else {
 								return null;
 							}
-						}else {
+						}
+						if(segmentCounter == (rightTraj.getNumSegments())) {
 							pathPack.path = new Path(name, new Pair(leftTraj,rightTraj));
 						}
 					}
@@ -209,6 +251,35 @@ public class PathManager {
 			}
 		}
 		return pathPack;
-		
+	}
+	
+	public static boolean compareConfig(Config a, Config b) {
+		return (Math.abs(a.dt - b.dt) < 0.001) && (Math.abs(a.max_vel - b.max_vel) < 0.001) && (Math.abs(a.max_acc - b.max_acc) < 0.001) && (Math.abs(a.max_jerk - b.max_jerk) < 0.001);
+	}
+	
+	public static boolean compareTrackWidth(double a, double b) {
+		return (Math.abs(a - b) < 0.001);
+	}
+	
+	public static boolean compareWaypoints(Waypoint a, Waypoint b) {
+		return (Math.abs(a.x - b.x) < 0.001)&&(Math.abs(a.y - b.y) < 0.001) &&(Math.abs(a.theta - b.theta) < 0.001);
+	}
+	
+	public static boolean compareWaypointSequences(WaypointSequence a, WaypointSequence b) {
+		boolean equal = true;
+		if(a.getNumWaypoints() != b.getNumWaypoints()) {
+			System.out.println();
+			return false;
+		}
+		for(int i = 0; i < a.getNumWaypoints(); i++) {
+			if(compareWaypoints(a.getWaypoint(i),b.getWaypoint(i))== false) {
+				equal = false;
+			}
+		}
+		return equal;
+	}
+	
+	public static boolean comparePathPacks(PathPack a, PathPack b) {
+		return compareConfig(a.config,b.config) && compareTrackWidth(a.track_width,b.track_width) && compareWaypointSequences(a.ws,b.ws);
 	}
 }

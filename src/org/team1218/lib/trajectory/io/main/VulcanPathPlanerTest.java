@@ -24,14 +24,17 @@ public class VulcanPathPlanerTest {
 		
 		WaypointSequence rightStartRightScaleWaypoints = new WaypointSequence(10);
 	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(0.0,0.0,0.0));
-	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(6, 0, 0));
+	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(7, 0, 0));
 	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(17.83,16,Math.toRadians(89.0)));
 		
 	     
 	    Path path = PathGenerator.makePath(rightStartRightScaleWaypoints, trajConfig, 2.0, "test");
-		PathManager.creatPathFile(new File("paths/" + path.getName() + ".path"), path, rightStartRightScaleWaypoints,trajConfig,2.0);
-		PathPack pathpack = PathManager.readPathFile(new File("paths/" + path.getName() + ".path"));
-		System.out.println(pathpack.path.toString());
+	    PathPack testPathPack = new PathPack();
+	    testPathPack.path = path;
+	    testPathPack.config = trajConfig;
+	    testPathPack.ws = rightStartRightScaleWaypoints;
+	    testPathPack.track_width = 2.0;
+		PathManager.getPath(testPathPack, "test");
 	}
 
 }
