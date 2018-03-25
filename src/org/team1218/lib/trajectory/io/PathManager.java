@@ -3,11 +3,9 @@ package org.team1218.lib.trajectory.io;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.Date;
 
@@ -29,6 +27,22 @@ public class PathManager {
 		public double trackWidth;
 	}
 	
+	public static String pathPrefix = "/home/lvuser/paths/";
+	
+	/**
+	 * @return the pathPrefix
+	 */
+	public static String getPathPrefix() {
+		return pathPrefix;
+	}
+
+	/**
+	 * @param pathPrefix the pathPrefix to set
+	 */
+	public static void setPathPrefix(String pathPrefix) {
+		PathManager.pathPrefix = pathPrefix;
+	}
+
 	public static Path getPath(WaypointSequence ws, Config config, double trackWidth, String name) {
 		PathPack pathPack = new PathPack();
 		pathPack.ws = ws;
@@ -38,8 +52,8 @@ public class PathManager {
 	}
 	
 	public static Path getPath(PathPack input, String name) {
-		File file = new File("paths/" + name + ".path");
-		System.out.println("attempting to find path file.");
+		File file = new File(pathPrefix + name + ".path");
+		System.out.println("attempting to find path file " + file.getAbsolutePath());
 		try{
 			PathPack output = readPathFile(file);
 			if(output != null) {
@@ -62,7 +76,7 @@ public class PathManager {
 		output.config = input.config;
 		output.trackWidth = input.trackWidth;
 		output.path = path;
-		System.out.println("Done, attempting to write result to file.");
+		System.out.println("Done, attempting to write result to file:" + file.getAbsolutePath());
 		try {
 			creatPathFile(file,output);
 		}catch(IOException e) {

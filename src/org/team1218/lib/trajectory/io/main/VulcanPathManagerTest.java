@@ -24,9 +24,10 @@ public class VulcanPathManagerTest {
 		
 		WaypointSequence rightStartRightScaleWaypoints = new WaypointSequence(10);
 	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(0.0,0.0,0.0));
-	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(7, 0, 0));
+	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(9, 0, 0));
 	    rightStartRightScaleWaypoints.addWaypoint(new WaypointSequence.Waypoint(17.83,16,Math.toRadians(89.0)));
 	    
+	    PathManager.setPathPrefix("path/");
 		PathManager.getPath(rightStartRightScaleWaypoints,trajConfig,2.0, "test");
 	}
 
