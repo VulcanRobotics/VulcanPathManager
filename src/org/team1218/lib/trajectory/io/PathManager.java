@@ -58,7 +58,7 @@ public class PathManager {
 			PathPack output = readPathFile(file);
 			if(output != null) {
 				if(comparePathPacks(input,output)) {
-					System.out.print("Path Match! Returning path from file.");
+					System.out.println("Path Match! Returning path from file.");
 					return output.path;
 				}else {
 					System.out.println("Path Mismatch!");
